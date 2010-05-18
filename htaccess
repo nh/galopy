@@ -1,0 +1,5 @@
+# Sample .htaccess file
+# Modify as needed!
+RewriteEngine on
+RewriteCond %{REQUEST_URI} !(webr.py)
+RewriteRule ^(.*)$ webr.py/$1  [L]

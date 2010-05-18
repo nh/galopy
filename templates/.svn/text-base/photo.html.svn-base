@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+#filter EncodeUnicode
+<head>
+    <title>$photo._title by $G.user._username on webr</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="${G.media}/style.css" />
+</head>
+
+<body>
+<div id="page">
+
+<div id="header">
+    <div class="alignleft"><a href="${G.root}">$G.name</a> ::  
+        #if $this_set
+            <a href="${G.root}set/$this_set._id/">$this_set._title</a> :: 
+        #end if
+        <i>$photo._title</i>
+    </div>
+    <div class="alignright">
+        <a href="$G.user._profile_url">$G.user._realname</a>
+    </div>
+</div>
+
+<div id="main">
+   <div style="float: left; margin: 4px; width: 70%; height: 100%;">
+    <h2>$photo._title</h2>
+    <a href="$photo._flickr_url">
+        <img class="thumbnail" src="$photo._img_urls['Medium']" 
+            alt="$photo._title" title="$photo._title" />
+    </a>
+   </div>
+    
+        <h2>&nbsp;</h2>
+        <div style="padding-left: 10px;">
+        <p style="text-align: justify;">$photo._desc.replace('\n','<br/>')</p>
+        <p style="text-align: right;">
+            <a href="$photo._flickr_url">$photo._comment_count comments</a>
+        </p>
+        </div>   
+        #if $this_set
+        <div>
+            <div class="alignleft">
+                #if $prev
+                <a href="${G.root}$prev._id/in/set-$this_set._id/">
+                <img class="thumbnail" src="$prev._img_urls['Square']" 
+                        alt="Previous photo: $prev._title" 
+                        title="Previous photo: $prev._title" />
+                </a>
+                #else
+                <img class="thumbnail"
+                     src="http://www.flickr.com/images/placeholder_first_photo.gif" 
+                        alt="No previous photo" title="No previous photo" />
+                #end if
+            </div>    
+            <div class="alignright">
+                #if $next
+                <a href="${G.root}$next._id/in/set-$this_set._id/">
+                    <img class="thumbnail" src="$next._img_urls['Square']" 
+                        alt="Next photo: $next._title" title="Next photo: $next._title" />
+                </a>
+                #else
+                <img class="thumbnail"  
+                     src="http://www.flickr.com/images/placeholder_last_photo.gif" 
+                     alt="No next photo" title="No next photo" />
+                #end if
+            </div>    
+        </div>    
+        #end if
+        
+        #if $other_sets
+        <div style="clear: right; padding: 2px; margin: 2px; ">
+        <p style="text-align: left">This photo also belongs to:</p>
+          <ul>
+          #for s in $other_sets
+            <li><a href="${G.root}set/$s._id/">$s._title</a></li>
+          #end for
+          </ul>
+        
+        </div>
+        #end if
+    
+</div>
+
+<div id="footer">
+   <p>
+   This photo gallery runs on <a href="http://www.antrix.net/stuff/webr">webr</a>
+   </p>
+</div>
+
+</div>
+</body>
+#end filter
+</html>
