@@ -26,12 +26,11 @@ web.config.debug = True
 
 render = web.template.render('templates/')
 
-raise NameError(abspath)
 class Data:
     pass
 # G is the global data struct used everywhere in webr.py!
 G = Data()
-G.user, G.sets_l, G.sets_d, G.photos_d = cPickle.load(open(sys.path[0]))
+G.user, G.sets_l, G.sets_d, G.photos_d = cPickle.load(open(os.path.join(abspath,config.FlickrDBFile)))
 G.root = config.SiteRoot
 G.media = config.MediaRoot
 G.name = config.GalleryName
