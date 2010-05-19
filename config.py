@@ -1,7 +1,5 @@
 import web
-import sys, os
-abspath = os.path.dirname(__file__)
-
+import sys
 # Make sure webr_update.py is called at least once to create the 
 # dump of Flickr photoset data
 
