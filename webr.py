@@ -5,13 +5,10 @@
 #      
 # author:   Deepak Sarda
 #           firstname@antrix.net
-#
 # requires: web.py (http://webpy.org)
 #           Cheetah template (http://www.cheetahtemplate.org/)
 #           flup (for web.py)
-#
 # Changelog: http://antrix.net/stuff/webr/Changelog
-#
 
 __author__      = 'Deepak Sarda'
 __version__     = '0.3'
