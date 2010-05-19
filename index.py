@@ -16,7 +16,7 @@ __license__     = 'GPL'
 __url__         = 'http://www.antrix.net/stuff/webr/'
 
 import sys, os
-abspath = sys.path[0]
+abspath = os.path.dirname(__file__)
 sys.path.append(abspath)
 os.chdir(abspath)
 
