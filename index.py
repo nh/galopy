@@ -26,7 +26,7 @@ web.config.debug = True
 
 render = web.template.render('templates/')
 
-raise NameError(sys.path[0])
+raise NameError(abspath)
 class Data:
     pass
 # G is the global data struct used everywhere in webr.py!
