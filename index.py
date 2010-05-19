@@ -18,8 +18,6 @@ __url__         = 'http://www.antrix.net/stuff/webr/'
 import os
 import sys
 
-print os.getcwd()
-sys.path.append(os.getcwd()) 
 
 import cPickle
 import web
@@ -140,6 +138,5 @@ urls = (
     '/?', 'IndexC',
 )
 
-app = web.application(urls, globals()).wsgifunc():w
-if __name__ == '__main__':
-    app.run()
+app = web.application(urls, globals(), autoreload=False)
+application = app.wsgifunc()
