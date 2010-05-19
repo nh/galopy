@@ -18,7 +18,6 @@ __url__         = 'http://www.antrix.net/stuff/webr/'
 import sys, os
 abspath = os.path.dirname(__file__)
 sys.path.append(abspath)
-os.chdir(abspath)
 
 import cPickle, web, config
 from webr_update import User, Photo, PhotoSet
