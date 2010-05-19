@@ -140,6 +140,6 @@ urls = (
     '/?', 'IndexC',
 )
 
-app = web.application(urls, globals())
+app = web.application(urls, globals()).wsgifunc():w
 if __name__ == '__main__':
     app.run()
