@@ -1,4 +1,4 @@
-<Module mod_rewrite.c>
+<IfModule mod_rewrite.c>
   RewriteEngine on
   RewriteBase /
   RewriteCond %{REQUEST_URI} !^/icons
