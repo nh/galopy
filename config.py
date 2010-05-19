@@ -9,5 +9,4 @@ MediaRoot = '/templates/'
 GalleryName = 'My Flickr Photosets'
 
 web.webapi.internalerror = web.debugerror
-middleware = [web.reloader]
 cache = False

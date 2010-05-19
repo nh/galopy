@@ -154,4 +154,4 @@ urls = (
 )
 
 if __name__ == '__main__':
-    web.run(urls, globals(), *config.middleware)
+    web.run(urls, globals())
