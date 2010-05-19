@@ -4,7 +4,7 @@ import sys
 # dump of Flickr photoset data
 
 FUser = "47608356@N06"
-FlickrDBFile = sys.path[0] + "/flickrdb.pickle.dump"
+FlickrDBFile = "/flickrdb.pickle.dump"
 SiteRoot = '/'
 MediaRoot = '/templates/'
 GalleryName = 'James Elliott Images'
