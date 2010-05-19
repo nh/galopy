@@ -15,9 +15,10 @@ __copyright__   = '(c) 2006 Deepak Sarda'
 __license__     = 'GPL'
 __url__         = 'http://www.antrix.net/stuff/webr/'
 
-import os
-import sys
-
+import sys, os
+abspath = os.path.dirname(__file__)
+sys.path.append(abspath)
+os.chdir(abspath)
 
 import cPickle
 import web
