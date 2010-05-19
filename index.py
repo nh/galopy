@@ -17,6 +17,8 @@ __url__         = 'http://www.antrix.net/stuff/webr/'
 
 import os
 import sys
+
+print os.getcwd()
 sys.path.append(os.getcwd()) 
 
 import cPickle
