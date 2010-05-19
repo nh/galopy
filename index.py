@@ -19,7 +19,7 @@ import sys, os
 abspath = os.path.dirname(__file__)
 sys.path.append(abspath)
 
-import cPickle, web, config
+import cPickle, web, config, webr_update
 from webr_update import User, Photo, PhotoSet
 
 web.config.debug = True
@@ -30,7 +30,7 @@ class Data:
     pass
 # G is the global data struct used everywhere in webr.py!
 G = Data()
-G.User, G.sets_l, G.sets_d, G.photos_d = cPickle.load(open(os.path.join(abspath,config.FlickrDBFile)))
+G.user, G.sets_l, G.sets_d, G.photos_d = cPickle.load(open(os.path.join(abspath,config.FlickrDBFile)))
 G.root = config.SiteRoot
 G.media = config.MediaRoot
 G.name = config.GalleryName
