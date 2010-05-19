@@ -25,8 +25,8 @@ import flickrapi
 from config import FUser, FlickrDBFile
 
 # The rest can be left as is.
-FKey = "9baf1fe6daf86b0602b1ca31f7a83688"
-FSecret = "2964866d87b3b8c5"
+FKey = "04133797314d6ff600f07314fe061643"
+FSecret = "b9f548992d4c62b0"
 
 fapi = flickrapi.FlickrAPI(FKey, FSecret)
 
@@ -38,86 +38,92 @@ class User:
     """This class is used to store user specific info like name, userid, etc."""
     def __init__(self):
         rsp = fapi.people_getInfo(api_key = FKey, user_id = FUser)
-        if rsp['stat'] == "fail":
-            # Print an error
-            fapi.testFailure(rsp, exit=False)
-            raise RuntimeError
+        for x in rsp[0]:
+            print x
+        #if rsp[0] != True:
+        #    Print an error
+        #    fapi.testFailure(rsp, exit=False)
+        #    raise RuntimeError
         
-        rsp = rsp.person[0]
+        rsp = rsp[0]
         
-        self._id = FUser
-        self._username = rsp.username[0].elementText
-        self._realname = rsp.realname[0].elementText
-        self._photos_url = rsp.photosurl[0].elementText
-        self._profile_url = rsp.profileurl[0].elementText
-        self._location = rsp.location[0].elementText
-        
-    def __str__(self): return self._realname
+        try:
+            self.id = FUser
+            self.username = rsp.find('username').text
+            self.photos_url = rsp.find('photosurl').text
+            self.profile_url = rsp.find('profileurl').text
+            self.realname = rsp.find('realname').text
+            self.location = rsp.find('location').text
+        except:
+            print "Missing info"
+ 
+    def __str__(self): return self.username
         
 class Photo:
     """All Photo specific stuff goes in here."""
     def __init__(self, photo_id, update = True):
-        self._img_urls = {}
-        self._id = str(photo_id)
+        self.img_urls = {}
+        self.id = str(photo_id)
         if update: self.update()
         
-    def __str__(self): return u"%s: %s" % (self._id, self._title)
+    def __str__(self): return u"%s: %s" % (self.id, self.title)
         
     def update(self):
-        rsp = fapi.photos_getInfo(api_key = FKey, photo_id = self._id)
-        if rsp['stat'] == "fail":
+        rsp = fapi.photos_getInfo(api_key = FKey, photo_id = self.id)
+        if rsp.attrib['stat'] == "fail":
             # Print an error
             fapi.testFailure(rsp, exit=False)
             raise RuntimeError
         
-        p = rsp.photo[0]
+        p = rsp[0]
         self.update_with_chunk(p)
         
     def update_with_chunk(self, p):
         """This method is needed since some flickr api calls return 
         this info as part of other calls. So we just reuse that info
         instead of making another remote api call."""
-        self._title = p.title[0].elementText
-        self._desc = p.description[0].elementText
-        self._taken = p.dates[0]["taken"]
-        self._comment_count = p.comments[0].elementText
-        self._flickr_url = p.urls[0].url[0].elementText
+        print p.find('dates')
+        self.title = p.find('title').text
+        self.desc = p.find('description').text
+        self.taken = p.find('dates').attrib["taken"]
+        self.comment_count = p.find('comments').text
+        self.flickr_url = p.find('urls')[0].text
         
     def update_img_urls(self):
         """"""
-        rsp = fapi.photos_getSizes(api_key=FKey, photo_id=self._id)
-        if rsp['stat'] == "fail":
+        rsp = fapi.photos_getSizes(api_key=FKey, photo_id=self.id)
+        if rsp.attrib['stat'] == "fail":
             # Print an error
             fapi.testFailure(rsp, exit=False)
             raise RuntimeError
 
-        for s in rsp.sizes[0].size:
-            self._img_urls[s['label']] = s['source']
+        for s in rsp[0].findall('size'):
+            self.img_urls[s.attrib['label']] = s.attrib['source']
             
 
 class PhotoSet:
     def __init__(self, set_id, update = True):
-        self._id = str(set_id)
-        self._photos = []
+        self.id = str(set_id)
+        self.photos = []
         if update: self.update()
     
     def __str__(self):
-        return u"Photoset # %s - %s. (%s photos)" % (self._id, self._title, self._pcount)
+        return u"Photoset # %s - %s. (%s photos)" % (self.id, self.title, self.pcount)
     
     def is_consistent(self):
-        if not len(self._photos) == int(self._pcount):
-            print "len(photos list) (%s) != stored photo count (%s)" % (len(self._photos), self._pcount)
+        if not len(self.photos) == int(self.pcount):
+            print "len(photos list) (%s) != stored photo count (%s)" % (len(self.photos), self.pcount)
             raise RuntimeError
         
-        if self._primary not in self._photos:
+        if self.primary not in self.photos:
             print "Primary photo not in photos list"
             return False
         
         return True
     
     def update(self):
-        rsp = fapi.photosets_getInfo(api_key=FKey, photoset_id = self._id)
-        if rsp['stat'] == "fail":
+        rsp = fapi.photosets_getInfo(api_key=FKey, photoset_id = self.id)
+        if rsp.attrib['stat'] == "fail":
             # Print an error
             fapi.testFailure(rsp, exit=False)
             raise RuntimeError
@@ -129,39 +135,42 @@ class PhotoSet:
         """This method is needed since some flickr api calls return 
         this info as part of other calls. So we just reuse that info
         instead of making another remote api call."""
-        self._id = p["id"]
-        self._pcount = p["photos"]
-        self._primary = p["primary"]
-        self._desc = p.description[0].elementText
-        self._title = p.title[0].elementText
-        
+        self.id = p.attrib["id"]
+        self.pcount = p.attrib["photos"]
+        self.primary = p.attrib["primary"] 
+        self.desc = p.find('description').text
+        self.title = p.find('title').text
+                
     def update_photo_list(self):
-        rsp = fapi.photosets_getPhotos(api_key=FKey, user_id=FUser, photoset_id=self._id)
-        if rsp['stat'] == "fail":
+        rsp = fapi.photosets_getPhotos(api_key=FKey, user_id=FUser, photoset_id=self.id)
+        if rsp.attrib['stat'] == "fail":
             # Print an error
             fapi.testFailure(rsp, exit=False)
             raise RuntimeError
-        
-        self._photos = [ p["id"] for p in rsp.photoset[0].photo ]
+        print dir(rsp[0])
+        self.photos = [ p.attrib["id"] for p in rsp[0] ]
                         
 def get_sets():
     """A utility function that gets the list of a user's photo sets 
     and their info from Flickr"""
     rsp = fapi.photosets_getList(api_key = FKey, user_id = FUser)
-    if rsp['stat'] == "fail":
+    if rsp.attrib['stat'] == "fail":
         # Print an error
         fapi.testFailure(rsp, exit=False)
         raise RuntimeError
     
+    for x in rsp[0]:
+        print x.attrib['id']
     sets_l = [] # Store just set ids to capture ordering at Flickr
     sets_d = {} # Store PhotoSet objects with setid as key
     
-    for s in rsp.photosets[0].photoset:
-        sets_l.append(s["id"])
-        ps = PhotoSet(set_id = s["id"], update = False)
+    for s in rsp[0]:
+        set = s.attrib['id']
+        sets_l.append(set)
+        ps = PhotoSet(set_id = set, update = False)
         ps.update_with_chunk(s)
         ps.update_photo_list()
-        sets_d[s["id"]] = ps
+        sets_d[set] = ps
         
     return sets_l, sets_d
 
@@ -176,14 +185,14 @@ if __name__ == '__main__':
         # Not all terminals understand UTF-8
         # If yours does, feel free to delete the 
         # encode bit - just s.__str__() will suffice
-        print s.__str__().encode('ascii', 'replace')
+        print s.__str__()
     
-    photos_d = {}
+    photos_d = {} #cPickle.load(open(FlickrDBFile))[3]
     
     for s in sets_d.itervalues():
         s.is_consistent()
         
-        for photo in s._photos:
+        for photo in s.photos:
             # A photo may belong to multiple sets!
             # Don't fetch multiple times!
             if photo not in photos_d:
@@ -192,9 +201,11 @@ if __name__ == '__main__':
                 # Not all terminals understand UTF-8
                 # If yours does, feel free to delete the 
                 # encode bit - just s.__str__() will suffice
-                print photos_d[photo].__str__().encode('ascii','replace')
+                print photos_d[photo].__str__()
             else:
                 print "Skipping", photo
+
+        s.primary_imgurl = photos_d[s.primary].img_urls
                 
     # POSIX rename is atomic
     # Good enough for me :-)                

@@ -2,11 +2,11 @@ import web
 # Make sure webr_update.py is called at least once to create the 
 # dump of Flickr photoset data
 
-FUser = "94046501@N00"
+FUser = "47608356@N06"
 FlickrDBFile = "flickrdb.pickle.dump"
 SiteRoot = '/'
 MediaRoot = '/templates/'
-GalleryName = 'My Flickr Photosets'
+GalleryName = 'James Elliott Images'
 
 web.webapi.internalerror = web.debugerror
 cache = False

@@ -23,6 +23,8 @@ import config
 
 from webr_update import User, Photo, PhotoSet
 
+render = web.template.render('templates/')
+
 class Data:
     pass
 # G is the global data struct used everywhere in webr.py!
@@ -40,7 +42,7 @@ def mime_type(filename):
 def getSets(p_id):
     """Return a list of set ids in which photo with id: p_id, exists"""
     p_id = str(p_id) # To be sure!
-    sets = [s for s in G.sets_l if p_id in G.sets_d[s]._photos]
+    sets = [s for s in G.sets_l if p_id in G.sets_d[s].photos]
     return sets 
 #end getSets
 
@@ -50,34 +52,15 @@ def getSiblings(p_id, s_id):
     """
     # This function will fail if set contains just one photo ;-)
     s = G.sets_d[str(s_id)]
-    i = s._photos.index(str(p_id))
+    i = s.photos.index(str(p_id))
     
     if i == 0:
-        return None, s._photos[1]
-    elif i == len(s._photos) - 1:
-        return s._photos[-2], None
+        return None, s.photos[1]
+    elif i == len(s.photos) - 1:
+        return s.photos[-2], None
     else:
-        return s._photos[i-1], s._photos[i+1]
+        return s.photos[i-1], s.photos[i+1]
 #end getSiblings
-
-# The following Cheetah Unicode Encoding Filter from
-# http://wiki.cheetahtemplate.org/cheetah-recipes.html
-import Cheetah.Filters
-class EncodeUnicode(Cheetah.Filters.Filter):
-     def filter(self, val, **kw):
-              """Encode Unicode strings, by default in UTF-8"""
-
-              if kw.has_key('encoding'):
-                            encoding = kw['encoding']
-              else:
-                            encoding='utf8'
-                            
-              if type(val) == type(u''):
-                            filtered = val.encode(encoding)
-              else:
-                            filtered = str(val)
-              return filtered
-#end class EncodeUnicode
 
 #### CONTROLLERS ####
 
@@ -85,8 +68,7 @@ class IndexC:
     def GET(self):
         # We want the sets in the same order they are sorted on Flickr
         sets = [ G.sets_d[s] for s in G.sets_l ]
-        primaries = [G.photos_d[s._primary] for s in sets]
-        web.render('index.html', ['sets', 'primaries', 'G'])
+        return render.index(sets,G)
 #end IndexC
 
 class SetC:
@@ -95,9 +77,9 @@ class SetC:
             return web.notfound()
         
         photoset = G.sets_d[str(set_id)]
-        primary = G.photos_d[photoset._primary]
-        photos = [G.photos_d[p] for p in photoset._photos]
-        web.render('set.html', ['photoset', 'primary', 'photos', 'G'])
+        primary = G.photos_d[photoset.primary]
+        photos = [G.photos_d[p] for p in photoset.photos]
+        return render.set(photoset,primary,photos,G)
 #end SetC
     
 class PhotoC:
@@ -117,20 +99,20 @@ class PhotoC:
             this_set = G.sets_d[set_id]
             
         if this_set:
-            prev, next = getSiblings(p_id, this_set._id)
+            prev, next = getSiblings(p_id, this_set.id)
             if prev: prev = G.photos_d[prev]
             if next: next = G.photos_d[next]
         else:
             prev, next = None, None
 
         photo = G.photos_d[p_id]
-        if not photo._title:
-            photo._title = 'Untitled'
+        if not photo.title:
+            photo.title = 'Untitled'
         
         other_sets = getSets(p_id)
         other_sets = [ G.sets_d[s] for s in other_sets if s != set_id]
         
-        web.render('photo.html', ['photo', 'this_set', 'other_sets', 'prev', 'next', 'G'])
+        return render.photo(photo,this_set,other_sets,prev,next,G)
 #end PhotoC
 
 class StaticServerC:
@@ -153,5 +135,6 @@ urls = (
     '/?', 'IndexC',
 )
 
+app = web.application(urls, globals())
 if __name__ == '__main__':
-    web.run(urls, globals())
+    app.run()
