@@ -1,4 +1,3 @@
-#!/usr/bin/python2.4
 #
 # webr.py: A virtual photo gallery software. It lets you showcase your flickr photosets 
 #          in a photo gallery on your domain, styled to your tastes.
