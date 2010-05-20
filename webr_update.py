@@ -18,7 +18,7 @@ __copyright__   = '(c) 2006 Deepak Sarda'
 __license__     = 'GPL'
 __url__         = 'http://www.antrix.net/stuff/webr/'
 
-import sys, os, cPickle
+import os, cPickle
 import flickrapi
 
 # Remember to change FUser to your Flickr userid!
