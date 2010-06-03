@@ -1,0 +1,107 @@
+body,html {
+margin:0;
+font-weight:bold;
+font-size:16px;
+font-family:sans-serif;
+}
+
+
+li a {
+    display:inline-block;
+    line-height:40px !important;
+    padding:3px 10px 0;
+    border:solid #fff;
+    border-width:3px 0;
+    vertical-align:center;
+}
+
+a {
+    color:#999;
+    text-decoration:none;
+}
+
+
+ul {
+    padding:0;
+    margin:0 50px;
+}
+
+h1 {
+margin:0;
+}
+
+h1 a {
+    margin:30px 50px 0;
+    background:#f3f3f3;
+    padding:20px 25px;
+    color:#555;
+    display:block;
+    height:50px;
+    line-height:50px;
+}
+
+li {
+    list-style:none;
+    border-left:3px solid #fff;
+}
+
+li img {
+    height:36px;
+    width:36px;
+    margin:-24px 5px -12px -40px;
+    padding:0;
+}
+
+li:nth-child(2n),li:nth-child(2n) a {background:#f3f3f3;border-color:#f3f3f3}
+
+b {color:#999}
+
+li:hover {
+}
+
+li:hover a:first-child {
+}
+
+li:hover img {
+}
+
+li a:hover {
+    color:#17f;
+    border-color:#ccc;
+
+}
+li a:first-child {
+    color:#555;
+    width:200px;
+    padding:6px 10px 3px 45px;
+    border:0;
+}
+
+li a:first-child:hover:after {
+content:"View \00bb";
+color:#17f;
+float:right;
+margin-bottom:-40px;
+}
+
+
+h1 a:after {
+content:"  Update";
+color:#ccc;
+margin-left:20px;
+}
+
+h1 a:hover:after {
+color:#17f;
+}
+
+#showset {
+    margin:40px;
+}
+
+#showset img {
+width:75px;
+height:75px;
+border:5px solid #f3f3f3;
+margin:10px 0 0 10px;
+}

@@ -1,0 +1,6 @@
+$def with (sets)
+<!doctype html><html><head><title>Sets</title></head><link rel="stylesheet" href="/static/admin.css"/>
+<body><h1><a href="/sets/update">All Sets <b>[$len(sets)]</b></a></h1><ul>
+$for s in sets:
+    <li><a href="/sets/$s.id"><img src="$s.thumb" />$s.title <b>[$s.pcount]</b></a><a href=/sets/update/$s.id>Update</a><a href=show/$s.id>Show</a></li>
+</ul>
