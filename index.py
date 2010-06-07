@@ -90,5 +90,5 @@ print [item for item in L1 if item not in L2]
 print [item for item in L2 if item not in L1]
 
 #app = web.application(urls, globals())
-app = web.application(urls, globals()).wsgifunc()
+application = web.application(urls, globals()).wsgifunc()
 if __name__ == "__main__": app.run()
