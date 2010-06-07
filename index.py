@@ -83,12 +83,7 @@ urls = (
     "/sets/(.*)","showSet",
 )
 
-L1 = (0,1,2,3,4,5,6,7)
-L2 = (0,1,2,3,44,5,6,7)
-
-print [item for item in L1 if item not in L2]
-print [item for item in L2 if item not in L1]
-
 #app = web.application(urls, globals())
 application = web.application(urls, globals()).wsgifunc()
-if __name__ == "__main__": app.run()
+if __name__ == "__main__":
+    app.run()
