@@ -89,6 +89,6 @@ L2 = (0,1,2,3,44,5,6,7)
 print [item for item in L1 if item not in L2]
 print [item for item in L2 if item not in L1]
 
-app = web.application(urls, globals())
-web.wsgi.runwsgi = lambda func, addr=None: web.wsgi.runfcgi(func, addr)
+#app = web.application(urls, globals())
+app = web.application(urls, globals()).wsgifunc()
 if __name__ == "__main__": app.run()
