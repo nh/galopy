@@ -1,5 +1,5 @@
 body,html {
-color:#bbb;
+color:#555;
 margin:0;
 font-weight:bold;
 font-size:16px;
@@ -8,14 +8,10 @@ font-family:sans-serif;
 
 
 li a {
-    display:inline-block;
-    line-height:40px !important;
-    padding:3px 10px 0;
-    border:solid #fff;
-    border-width:3px 0;
     vertical-align:center;
-    width:60px;
     text-align:center;
+    font-size:16px;
+    float:right;
 }
 
 
@@ -24,6 +20,9 @@ a {
     text-decoration:none;
 }
 
+.hidden {
+    opacity:0.5;
+}
 
 ul {
     padding:0;
@@ -31,73 +30,45 @@ ul {
 }
 
 h1 {
-margin:0;
+    margin:30px 50px 0;
+    background:#f3f3f3;
 }
 
 h1 a {
-    margin:30px 50px 0;
-    background:#f3f3f3;
     padding:20px 25px;
     color:#555;
-    display:block;
+    display:inline-block;
     height:50px;
     line-height:50px;
 }
 
 li {
     list-style:none;
-    border-left:3px solid #fff;
+    line-height:18px;
+    display:block;
+    float:left;
+    width:250px;
+    padding:7px 5px 3px 7px;
+    background:#f3f3f3;
+    margin:7px 7px 0 0;
 }
 
 li img {
     height:36px;
     width:36px;
-    margin:-24px 5px -12px -40px;
-    padding:0;
+    margin:-2px;
+    float:left;
+    padding-right:7px;
 }
 
-li:nth-child(2n),li:nth-child(2n) a {background:#f3f3f3;border-color:#f3f3f3}
+/*li:nth-child(2n),li:nth-child(2n) a {background:#f3f3f3;border-color:#f3f3f3}*/
 
 b {color:#999}
 
-li:hover {
-}
-
-li:hover a:first-child {
-}
-
-li:hover img {
-}
 
 li a:hover {
     color:#17f;
-    border-color:#ccc;
 
-}
-li a:first-child {
-    color:#555;
-    width:200px;
-    padding:6px 10px 3px 45px;
-    border:0;
-    text-align:left;
-}
-
-li a:first-child:hover:after {
-content:"View \00bb";
-color:#17f;
-float:right;
-margin-bottom:-40px;
-}
-
-
-h1 a:after {
-content:"  Update";
-color:#ccc;
-margin-left:20px;
-}
-
-h1 a:hover:after {
-color:#17f;
 }
 
 #showset {

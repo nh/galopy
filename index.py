@@ -14,16 +14,16 @@ f = flickrapi.FlickrAPI(Fkey, Fsecret)
 
 db = web.database(dbn='sqlite',db='gal.db')
 render = web.template.render('templates/')
-progress = [0,100]
+progress = 0
 
 class UpdateStatus:
     def __init__(self):
         self.progressbar = 0
 
 
-class showSetlist:
+class ViewSetlist:
     def GET(self):
-        return render.sets(list(db.select("sets")))
+        return render.sets(list(db.select("sets",order="visible DESC")),len(list(db.select('imgs'))))
 
 class dropsets:
     def GET(self):
@@ -52,25 +52,25 @@ class UpdateSetlist:
             print 'Deleted set %s' % (deadset)
 
         setlist = list(db.select("sets"))
-        return render.sets(setlist)
+        raise web.seeother('/sets')
 
 class UpdateImgs:
     def __init__(self,setids):
         global progress
-        imgs = ET.Element("imgs")
+        imgs = []
         for setid in setids:
-            imgs.insert(0,f.photosets_GetPhotos(api_key = Fkey, photoset_id = setid,extras="last_update,url_sq,url_m")[0])
-        imgs = imgs[0]
-        progress = [0,len(imgs)]
-        setsquery = "".join(["keys.set_id = %s OR" % k for k in setids]).rstrip(" OR")
+            imgs.extend(list(f.photosets_GetPhotos(api_key = Fkey, photoset_id = setid,extras="last_update,url_sq,url_m")[0]))
+        print setids
+        progress = 0
+        setsquery = "".join(["keys.set_id = %s OR " % k for k in setids]).rstrip(" OR ")
         dbimgsids = [str(x.id) for x in db.query("SELECT imgs.id FROM imgs INNER JOIN keys ON imgs.id = keys.img_id AND (" + setsquery + ")")]
         print dbimgsids
         for newimg in [item for item in imgs if item.attrib["id"] not in dbimgsids]: # All new images that are not already in this set
             #db.query("INSERT OR IGNORE INTO keys VALUES ("+newimg.attrib["id"]+","+setid+")")
-            db.query("INSERT OR IGNORE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=newimg.attrib) # Don't add image to imglist if it already exists in another set...
+            db.query("INSERT OR IGNORE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=newimg.attrib) # Don't add image to full imglist if it already exists in another set...
             db.insert("keys",img_id=newimg.attrib["id"],set_id=setid) # ...but still add to this set's imglist
             #time.sleep(3)
-            progress[0] += 1   
+            progress += 1   
 
         for changedimg in [x for x in imgs if int(x.attrib["lastupdate"]) > db.select("imgs",what="lastupdate",where="id="+x.attrib["id"])[0].lastupdate]:
             db.update("imgs",where="id="+changedimg.attrib["id"],title=changedimg.attrib["title"],lastupdate=changedimg.attrib["lastupdate"])
@@ -80,15 +80,32 @@ class UpdateImgs:
             db.delete("keys",where="img_id="+deadimg)
             db.delete("imgs",where="id="+deadimg)
             print 'Deleted image %s' % (deadimg)
-        progress = [0,100]
+        progress = 0
 
-class showSet:
+class UpdateAll:
+    def GET(self):
+        UpdateImgs([str(x.id) for x in db.select("sets",where="visible=1")])
+        raise web.seeother('/sets')
+
+class ShowSet:
+    def GET(self,setid):
+        db.update("sets",where="id="+setid,visible=1)
+        raise web.seeother('/sets')
+
+class HideSet:
+    def GET(self,setid):
+        db.delete('keys', where="set_id="+setid)
+        db.delete('imgs', where="id NOT IN (SELECT img_id FROM keys)")
+        db.update("sets", where="id="+setid,visible=0)
+        raise web.seeother('/sets')
+
+class ViewSet:
     def GET(self,id):
         set = db.select("sets",where="id = "+id)[0]
         imglist = list(db.query("SELECT * FROM imgs INNER JOIN keys ON imgs.id = keys.img_id AND keys.set_id = "+id))
         return render.setimgs(set,imglist)
 
-class updateSet:
+class UpdateSet:
     def GET(self,id):
         UpdateImgs([id])
         #set = db.select("sets",where="id = "+id)[0]
@@ -98,11 +115,10 @@ class updateSet:
 class UpdateStatus:
     def GET(self):
         global progress
-        status = int((1.0*progress[0]/progress[1])*100)
-        if status == 0:
+        if progress == 0:
             return "Done"
         else:
-            return str(status)+"%"
+            return progress
 
 class admincss:
     def GET(self):
@@ -128,10 +144,13 @@ urls = (
     "/a.css","admincss",
     "/status","UpdateStatus",
     "/dropsets","dropsets",
-    "/sets/update","UpdateSetlist",
-    "/sets", "showSetlist",
-    "/sets/update/(.*)","updateSet",
-    "/sets/(.*)","showSet",
+    "/updatesetlist","UpdateSetlist",
+    "/updateall","UpdateAll",
+    "/sets", "ViewSetlist",
+    "/update/(.*)","UpdateSet",
+    "/show/(.*)","ShowSet",
+    "/hide/(.*)","HideSet",
+    "/view/(.*)","ViewSet",
 )
 
 app = web.application(urls, globals())
