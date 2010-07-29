@@ -16,21 +16,43 @@ db = web.database(dbn='sqlite',db='gal.db')
 render = web.template.render('templates/')
 progress = 0
 
+def dropsets():
+    db.query("DELETE FROM imgs")
+    db.query("DELETE FROM sets")
+    db.query("DELETE FROM keys")
+
 class UpdateStatus:
     def __init__(self):
         self.progressbar = 0
 
-
-class ViewSetlist:
+class ViewUsedSets:
     def GET(self):
-        return render.sets(list(db.select("sets",order="visible DESC")),len(list(db.select('imgs'))))
+        return render.sets(db.select("user")[0],list(db.select("sets",where="visible=1")),len(list(db.select('imgs'))),False)
+    #def POST(self):
+        #?????????????????????????????????????? GET/POST SEPARATION NEEDS FIXIN!
 
-class dropsets:
+class ViewAllSets:
+    def GET(self):
+        return render.sets(db.select("user")[0],list(db.select("sets")),len(list(db.select('imgs'))),True)
+
+class DropSets:
     def GET(self):
         db.query("DELETE FROM imgs")
         db.query("DELETE FROM sets")
         db.query("DELETE FROM keys")
         return "dropped sets!"
+
+class UpdateUser:
+    def POST(self):
+        i = web.input()
+        if db.query("SELECT COUNT(*) AS total FROM user")[0].total == 0 or i.user.lower() != db.select("user")[0].username:
+            dropsets()         
+            user = f.people_GetInfo(api_key = Fkey,user_id = f.people_FindByUsername(api_key = Fkey,username = i.user)[0].attrib["nsid"])[0]
+            u = dict([(i.tag,i.text) for i in user.getchildren()])
+            db.query("delete FROM user")
+            db.insert("user",nsid=user.attrib["nsid"],username=u["username"].lower(),photosurl=u["photosurl"],profileurl=u["profileurl"])
+            raise web.seeother('/sets/all')
+        raise web.seeother('/sets')
 
 class UpdateSetlist:
     def GET(self):
@@ -90,7 +112,7 @@ class UpdateAll:
 class ShowSet:
     def GET(self,setid):
         db.update("sets",where="id="+setid,visible=1)
-        raise web.seeother('/sets')
+        raise web.seeother('/sets/all')
 
 class HideSet:
     def GET(self,setid):
@@ -143,14 +165,16 @@ urls = (
     "/a.js","adminjs",
     "/a.css","admincss",
     "/status","UpdateStatus",
-    "/dropsets","dropsets",
+    "/dropsets","DropSets",
     "/updatesetlist","UpdateSetlist",
     "/updateall","UpdateAll",
-    "/sets", "ViewSetlist",
+    "/sets/all", "ViewAllSets",
+    "/sets", "ViewUsedSets",
     "/update/(.*)","UpdateSet",
     "/show/(.*)","ShowSet",
     "/hide/(.*)","HideSet",
     "/view/(.*)","ViewSet",
+    ".*","UpdateUser",
 )
 
 app = web.application(urls, globals())

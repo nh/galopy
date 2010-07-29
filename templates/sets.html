@@ -1,14 +1,20 @@
-$def with (sets,imgs)
+$def with (user,sets,imgs,all)
 <!doctype html><html><head><title>Sets</title><link rel="stylesheet" href="/a.css"/><script type="text/javascript" src="/a.js"></script></head>
-<body><h1><a href="/updatesetlist">Update Set List <b>[$len(sets)]</b></a><a href="/updateall">Update All Images<b>[$imgs]</b></a></h1><ul>
-$for s in sets:
-    <li \
-    $if not s.visible:
-        class="hidden"\
-    ><img src="$s.thumb" />\
-    $if s.visible:
-        <a href=/hide/$s.id>&nbsp;Hide</a><a href=/update/$s.id>Update</a>\
-    $else:
-        <a href=/show/$s.id>&nbsp;Show</a>\
-    $s.title<a style="clear:right;" href="/view/$s.id">$s.pcount</a></li>
+<body><ul>
+<h2><a href="/updatesetlist">Update Set List <b>[$len(sets)]</b></a></h2><h2><a href="/updateall">Update All Images<b>[$imgs]</b></a></h2>
+$for s in [s for s in sets if s.visible]:
+    <li><a href=/view/$s.id><img src="$s.thumb"/>$s.title</a>\
+    <a class="update" href=/update/$s.id>$s.pcount</a>\
+    <a class="hide" href=/hide/$s.id></a></li>\
+$if all:
+    <h2><a href="/sets"><b>&laquo</b> Hide Unused Sets</a></h2>
+    $for s in [s for s in sets if not s.visible]:
+        <li><a href=/view/$s.id><img src="$s.thumb"/>$s.title</a>
+        <a class="update" href=/update/$s.id>$s.pcount</a>\
+        <a class="show" href=/show/$s.id></a></li>\
+$else:
+    <h2><a href="/sets/all">Show Unused Sets <b>&raquo</b></a></h2>
+<form method="post">
+<input type="text" name="user" value="$user.username"/><input type="submit" value="Change"/>
+</form> 
 </ul>

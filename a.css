@@ -1,37 +1,106 @@
 body,html {
-color:#555;
 margin:0;
 font-weight:bold;
 font-size:16px;
 font-family:sans-serif;
 }
 
-
-li a {
-    vertical-align:center;
-    text-align:center;
-    font-size:16px;
-    float:right;
+ul {
+    position:relative;
+    float:left;
+    clear:both;
+    padding:0;
+    margin:0 10px;
 }
 
+h2 {
+display:inline;
+}
+
+li, h2 a {
+    list-style:none;
+    line-height:41px;
+    display:block;
+    float:left;
+    min-width:240px;
+    max-width:300px;
+    height:32px;
+    padding:9px;
+    background:#eee;
+    margin:9px 9px 0 0;
+    text-align:center;
+    border-bottom:2px solid #ddd;
+}
+
+h2 a {
+background:#ddd;
+border-bottom-color:#ccc;
+}
 
 a {
-    color:#999;
+    color:#777;
     text-decoration:none;
 }
 
-.hidden {
-    opacity:0.5;
+
+li a {
+    display:block;
+    height:32px;
+    line-height:18px;
+    width:30px;
+    margin:-9px;
+    vertical-align:center;
+    font-size:16px;
+    float:right;
+    padding:9px;
+    overflow:hidden;
 }
 
-ul {
-    padding:0;
-    margin:0 50px;
+.hide, .show {
+    margin:-9px 0 -41px -50px;
 }
 
-h1 {
-    margin:30px 50px 0;
-    background:#f3f3f3;
+li a:first-child {
+    float:left;
+    margin:-9px;
+    width:200px;
+    text-align:left;
+}
+
+ul a:hover {
+    color:#4af;
+}
+ul a:hover b {
+    color:#47a;
+}
+li a:hover {
+    color:#17f;
+}
+
+.hide, .show:hover {
+    background:#aaa 3px 9px url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA2CAYAAACMRWrdAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAidJREFUeNrsmU1LVGEYhj06+JEfmIklbRRJSlqYC0XdaJI/wZVtBIUW+gNctXUhhKsW4k4i2pQoGBKJIFgLjcg+FiqJSSmM+a1ojtcD92J+gDO8Dc8LFzOcj+G9znOf57zDieLxeCIrA0d2VoYOF3MxF3MxF3MxF3MxF3MxF3MxF8tssUSmiZnQB1iDf/AH3qZDNJai352A21AJL2EOjuFEF/M+PIYD6IL8kMXOIUeTnYVl+AKb2p6n40xuFabgloT7IApVLCahz/BKQha563AHCiW4D9v6HocB+AZDSfLBRXESRuECbsINqFXUdiVqES2CNkX1mc5ZEEE1D5vwGDzXxWqCaSiAcvipCm6qclbB99AN89AOn+BhaGKLsAQVUK+Gsar75q+il6tjVySfLY60L0dVDUrMovZRkxuBMqiC06SmsiMBq+IW/Na51jjWNZeO0MTqVJlrMKwrX69tBWoK+3qW5Wl/AzTDhqLaAoOhiVnkelQdu1f6JdUKv+CeRAp1P5rMCz0OvquSb6A0xJVHtyb4FWbgEdxV+1+TtDWPH2rzCUX1AfRe9UM6uuK3LValRjWOIlXyUHEsVhO50LEWyxJ1xWrFONglValWFE/0DHsNZ5I40qdtH1cM7d6qScWSKkrx+7E9eAqdaibvJNOvCqZsRGl48XesZMQUxWJF879c3SePZIkK/wftYi7mYi7mYi7mYi7mYi7mYi7mYi7mYmkYlwIMAGvuhBsZAPFjAAAAAElFTkSuQmCC);
+}
+
+.hide:hover, .show {
+    background:#aaa 3px 9px url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA2CAYAAACMRWrdAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAgFJREFUeNrsmc9LVFEUx99zZtCaUdEK1JYiGBIUboSKfglC0B/govZtBZfSsoWStGrRup1B0DZaCG1axEBQBEFBRZo4FU2iTjV+LnwfXB7zJoIZuTOcAx/m55u5nzn3nHvfm7hSqdSjLoyeqEvDxEzMxEzMxEzMxEzMxEzMxEzMxEyspZFv42e7Sw67sANV+Al/9FovDEAf9EOhE8ScyEf4DN8kWIRhT8A9/063R2AKToUo9htieAuvNNgJmFR2ku+JJZrcdxn8Ai9gG86HJvYJXsM+TMNx1W9dAv709B/n4CQMSbBlEbfo8lvVq5+4gYAvFmVkz3FUssF0xZLqJ/YGmvljprIXaxrWVXfBtfucl4F6gwxlyW2q4byEhdDEHsNFqMFeE6lk+vlT9TvcgcvwNTQxN8gynIW/auNpkbTsD3gE1+EhjMJaaM0jklRZ69VzOKG6SzcSN/WewAYse8+vw4UQF+hVuKtBu8V2Vsyphn7BfTWKLXij447BGRgMsd0n4daic/D+P46Zh3vKcLCb4FFlZQyuNnnfEizCDFyBD52wV5zTNLsND+AmjMAteAZP4ZqkInXSnk4Qi7RzX9HadkMZvATjcFqZTaLQjgHEh/CPZk1dMe9tv4r/2J0EfT6WlZGSnUGbmImZmImZmImZmImZmImZmImZmImFEgcCDACW7nCI6paxegAAAABJRU5ErkJggg==);
+}
+
+.update {
+    margin:-9px;
+    width:24px;
+    background:#aaa center 9px url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA2CAYAAACMRWrdAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAfFJREFUeNrsmM8rRFEUx99MHj008mPkZzZ+rFj4MQsb8RdYISEJG8nShhJ7NkopC2VrdhaIBSklNmQ1pWjIj2asMH5/b53F6TVvVvO4bzqnPvXmzn1v+sw999zT88VisR8jA8NvZGiImIiJmIiJmIiJmIiJmIiJmIhpHll/8BtvIAISoBYUeH3FHsEsqASNoBVUgTqwCOJuivlcejWwA0bAHfh2mFMBFmieJ1ZsHwyAKJMyQaFt3i2YBEts7J3GtVuxV9AFjtlYCAyCMnABwuCcfV8EDsEXGAdToE83MfXvT4MPWqVRGsthc15INMzGSml1n8ARaNctFU9JSkU1mLNJqcgFm6CZjT2QlAXKdSz3UXbdQGlmD7UyZw7355OcdmIJdh1I8ny1B3vANltZHla6sijdqRiwnWP2UFWvhc60oMP9lo5iIXYdsaWmQV2H2ncHYA+M0YFtsv2XraNYPzuvrsFKii2gupFVKjjLoA3UqEqt4zn2CbrBFn0uBjNgiAqDKhz3VN6tJGkapxT16yam4gp0gBtWEJpI0qDDuROsudmEu9UrnoBhcJlijmqQ573W3av9sktpWUJFwSSCtL/qvdjd88N4A6yDZxqbAL0gz8ti8mpAxERMxERMxERMxERMxERMxERMxERMxP4jfgUYAOlqb7SgDO86AAAAAElFTkSuQmCC);
+}
+
+.show:hover, .hide:hover, .update:hover {
+    background-color:#17f !important;
+}
+
+
+.hidden a {
+opacity:0.4;
+}
+.hidden li:hover a {
+opacity:1;
 }
 
 h1 a {
@@ -42,16 +111,6 @@ h1 a {
     line-height:50px;
 }
 
-li {
-    list-style:none;
-    line-height:18px;
-    display:block;
-    float:left;
-    width:250px;
-    padding:7px 5px 3px 7px;
-    background:#f3f3f3;
-    margin:7px 7px 0 0;
-}
 
 li img {
     height:36px;
@@ -66,10 +125,7 @@ li img {
 b {color:#999}
 
 
-li a:hover {
-    color:#17f;
 
-}
 
 #showset {
     margin:40px;
