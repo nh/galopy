@@ -1,20 +1,20 @@
-$def with (user,sets,imgs,all)
+$def with (conf,sets,imgs)
 <!doctype html><html><head><title>Sets</title><link rel="stylesheet" href="/a.css"/><script type="text/javascript" src="/a.js"></script></head>
 <body><ul>
-<form action="" method="post">
+<form action="/update" method="post">
 <h2><a href="/updatesetlist">Update Set List <b>[$len(sets)]</b></a></h2><h2><a href="/updateall">Update All Images<b>[$imgs]</b></a></h2>
 $for s in [s for s in sets if s.visible]:
     <li><a href=/view/$s.id><img src="$s.thumb"/>$s.title</a>\
     <a class="update" href=/update/$s.id>$s.pcount</a>\
     <a class="hide" href=/hide/$s.id></a></li>\
-$if all:
-    <h3><input type="submit" name="update" value="showunused" /></h3>
+$if conf['visible'] == "1":
+    <h3><input type="submit" name="update" value="Hide Unused Sets" /></h3>
     $for s in [s for s in sets if not s.visible]:
         <li><a href=/view/$s.id><img src="$s.thumb"/>$s.title</a>
         <a class="update" href=/update/$s.id>$s.pcount</a>\
         <a class="show" href=/show/$s.id></a></li>\
 $else:
-    <h2><a href="/sets/all">Show Unused Sets <b>&raquo</b></a></h2>
+    <h3><input type="submit" name="update" value="Show Unused Sets" /></h3>
 <h3><input type="submit" name="update" value="updatesetlist"/></h3>
 </form> 
 </ul>

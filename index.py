@@ -31,11 +31,11 @@ class ViewUsedSets:
     #def POST(self):
         #?????????????????????????????????????? GET/POST SEPARATION NEEDS FIXIN!
 
-class ViewAllSets:
-    def GET(self):
-        return render.sets(db.select("user")[0],list(db.select("sets")),len(list(db.select('imgs'))),True)
-
 class Admin:
+    def GET(self):
+        return render.sets(dict([(conf.name,conf.val) for conf in db.select("conf")]),list(db.select("sets")),len(list(db.select('imgs'))))
+
+class Update:
     def POST(self):
         i = web.input(update=[])
         if i.update == "updatesetlist":
@@ -55,14 +55,15 @@ class Admin:
             for deadset in [item for item in dbsets if item not in [y.attrib["id"] for y in sets]]:
                 db.delete("sets",where="id="+deadset)
                 print 'Deleted set %s' % (deadset)
-        if i.update == "showunused":
-            db.insert("conf",where="name=visible",val=1)
-        print i["update"]
-        return render.sets(db.select("conf"),list(db.select("sets")),len(list(db.select('imgs'))),True)
+        if i["update"][0] == "Show Unused Sets":
+            db.update("conf",where="name='visible'",val=1)
+        elif i["update"][0] == "Hide Unused Sets":
+            db.update("conf",where="name='visible'",val=0)
+        print db.select("conf")[0]
+        raise web.seeother('/')
     def GET(self):
         print "GET!!!!"
         return render.sets(list(db.select("conf")),list(db.select("sets")),len(list(db.select('imgs'))),True)
-
 
 class DropSets:
     def GET(self):
@@ -170,9 +171,10 @@ print photos[0].attrib['total']
 """
 
 urls = (
-    "/admin","Admin",
+    "/update","Update",
     "/a.js","adminjs",
     "/a.css","admincss",
+    "/","Admin",
 )
 """/status","UpdateStatus",
 "/dropsets","DropSets",
