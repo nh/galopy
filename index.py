@@ -35,6 +35,35 @@ class ViewAllSets:
     def GET(self):
         return render.sets(db.select("user")[0],list(db.select("sets")),len(list(db.select('imgs'))),True)
 
+class Admin:
+    def POST(self):
+        i = web.input(update=[])
+        if i.update == "updatesetlist":
+            sets = f.photosets_GetList(api_key = Fkey, user_id = Fuser)[0]
+            dbsets = [str(x["id"]) for x in db.select("sets",what="id")]
+            for newset in [item for item in sets if item.attrib["id"] not in dbsets]:
+                db.insert(
+                    "sets",
+                    id=newset.attrib["id"],
+                    pcount=newset.attrib["photos"],
+                    pri=newset.attrib["primary"],
+                    thumb="http://farm%s.static.flickr.com/%s/%s_%s_s.jpg" % (newset.attrib["farm"],newset.attrib["server"],newset.attrib["primary"],newset.attrib["secret"]),  
+                    title=newset[0].text,
+                    desc=newset[1].text
+                )
+                print 'Added set %s' % (newset[0].text)
+            for deadset in [item for item in dbsets if item not in [y.attrib["id"] for y in sets]]:
+                db.delete("sets",where="id="+deadset)
+                print 'Deleted set %s' % (deadset)
+        if i.update == "showunused":
+            db.insert("conf",where="name=visible",val=1)
+        print i["update"]
+        return render.sets(db.select("conf"),list(db.select("sets")),len(list(db.select('imgs'))),True)
+    def GET(self):
+        print "GET!!!!"
+        return render.sets(list(db.select("conf")),list(db.select("sets")),len(list(db.select('imgs'))),True)
+
+
 class DropSets:
     def GET(self):
         db.query("DELETE FROM imgs")
@@ -45,36 +74,15 @@ class DropSets:
 class UpdateUser:
     def POST(self):
         i = web.input()
-        if db.query("SELECT COUNT(*) AS total FROM user")[0].total == 0 or i.user.lower() != db.select("user")[0].username:
+        if db.select("conf",where="name=username")[0].val != i.user.lower():
             dropsets()         
             user = f.people_GetInfo(api_key = Fkey,user_id = f.people_FindByUsername(api_key = Fkey,username = i.user)[0].attrib["nsid"])[0]
             u = dict([(i.tag,i.text) for i in user.getchildren()])
             db.query("delete FROM user")
-            db.insert("user",nsid=user.attrib["nsid"],username=u["username"].lower(),photosurl=u["photosurl"],profileurl=u["profileurl"])
-            raise web.seeother('/sets/all')
-        raise web.seeother('/sets')
-
-class UpdateSetlist:
-    def GET(self):
-        sets = f.photosets_GetList(api_key = Fkey, user_id = Fuser)[0]
-        dbsets = [str(x["id"]) for x in db.select("sets",what="id")]
-        for newset in [item for item in sets if item.attrib["id"] not in dbsets]:
-            db.insert(
-                "sets",
-                id=newset.attrib["id"],
-                pcount=newset.attrib["photos"],
-                pri=newset.attrib["primary"],
-                thumb="http://farm%s.static.flickr.com/%s/%s_%s_s.jpg" % (newset.attrib["farm"],newset.attrib["server"],newset.attrib["primary"],newset.attrib["secret"]),  
-                title=newset[0].text,
-                desc=newset[1].text
-            )
-            print 'Added set %s' % (newset[0].text)
-        for deadset in [item for item in dbsets if item not in [y.attrib["id"] for y in sets]]:
-            db.delete("sets",where="id="+deadset)
-            print 'Deleted set %s' % (deadset)
-
-        setlist = list(db.select("sets"))
-        raise web.seeother('/sets')
+            db.insert("conf",name="nsid",val=user.attrib["nsid"])
+            db.insert("conf",name="username",val=user.attrib["username"].lower())
+            db.insert("conf",name="photosurl",val=user.attrib["photosurl"])
+            db.insert("conf",name="profileurl",val=user.attrib["profileurl"])
 
 class UpdateImgs:
     def __init__(self,setids):
@@ -162,20 +170,21 @@ print photos[0].attrib['total']
 """
 
 urls = (
+    "/admin","Admin",
     "/a.js","adminjs",
     "/a.css","admincss",
-    "/status","UpdateStatus",
-    "/dropsets","DropSets",
-    "/updatesetlist","UpdateSetlist",
-    "/updateall","UpdateAll",
-    "/sets/all", "ViewAllSets",
-    "/sets", "ViewUsedSets",
-    "/update/(.*)","UpdateSet",
-    "/show/(.*)","ShowSet",
-    "/hide/(.*)","HideSet",
-    "/view/(.*)","ViewSet",
-    ".*","UpdateUser",
 )
+"""/status","UpdateStatus",
+"/dropsets","DropSets",
+"/updatesetlist","UpdateSetlist",
+"/updateall","UpdateAll",
+"/sets/all", "ViewAllSets",
+"/sets", "ViewUsedSets",
+"/update/(.*)","UpdateSet",
+"/show/(.*)","ShowSet",
+"/hide/(.*)","HideSet",
+"/view/(.*)","ViewSet",
+".*","UpdateUser","""
 
 app = web.application(urls, globals())
 #application = web.application(urls, globals()).wsgifunc()
