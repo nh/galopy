@@ -1,20 +1,21 @@
 $def with (conf,sets,imgs)
 <!doctype html><html><head><title>Sets</title><link rel="stylesheet" href="/a.css"/><script type="text/javascript" src="/a.js"></script></head>
 <body><ul>
-<form action="/update" method="post">
-<h2><a href="/updatesetlist">Update Set List <b>[$len(sets)]</b></a></h2><h2><a href="/updateall">Update All Images<b>[$imgs]</b></a></h2>
+<form name="testform" action="/update" method="post">
+<input class="button" type="submit" name="update" value="Update Set List [$len(sets)]"/><input class="button" type="submit" name="update" value="Update All Images [$imgs]"/>
 $for s in [s for s in sets if s.visible]:
-    <li><a href=/view/$s.id><img src="$s.thumb"/>$s.title</a>\
-    <a class="update" href=/update/$s.id>$s.pcount</a>\
-    <a class="hide" href=/hide/$s.id></a></li>\
-$if conf['visible'] == "1":
-    <h3><input type="submit" name="update" value="Hide Unused Sets" /></h3>
+    <li><a href=/view/$s.id><img src="$s.thumb"/></a><a href=/view/$s.id><i>$s.pcount</i>$:s.formattedtitle</a>\
+    <input class="update" href=/update/$s.id />\
+    <input class="hide" type="submit" name="hide" value="$s.id"/></li>\
+$if 'visible' in conf and conf['visible'] == "1":
+    <input class="button" type="submit" name="update" value="Hide Unused Sets" />
     $for s in [s for s in sets if not s.visible]:
-        <li><a href=/view/$s.id><img src="$s.thumb"/>$s.title</a>
-        <a class="update" href=/update/$s.id>$s.pcount</a>\
-        <a class="show" href=/show/$s.id></a></li>\
+        <li class="unused"><a href=http://www.flickr.com/photos/nylecoj/sets/$s.id/><img src="$s.thumb"/></a><span><i>$s.pcount</i>$:s.formattedtitle</span>\
+        <input class="show" type="submit" name="show" value="$s.id" /></li>\
 $else:
-    <h3><input type="submit" name="update" value="Show Unused Sets" /></h3>
-<h3><input type="submit" name="update" value="updatesetlist"/></h3>
+    <input class="button" type="submit" name="update" value="Show Unused Sets" />
+<input class="button" type="text" name="username" value="$conf["username"]" />
+<input class="button" type="submit" name="user" value="Change User" />
+<input class="button" type="submit" name="update" value="Kill All" />
 </form> 
 </ul>

@@ -1,9 +1,8 @@
 import flickrapi
 import web
 import time
+import re
 import elementtree.ElementTree as ET
-Fuser = "54827292@N00" #me
-Fuser = "25721820@N00" #joz
 
 db = "gal.db"
 
@@ -15,6 +14,7 @@ f = flickrapi.FlickrAPI(Fkey, Fsecret)
 db = web.database(dbn='sqlite',db='gal.db')
 render = web.template.render('templates/')
 progress = 0
+Fuser = db.select("conf",where="name='nsid'")[0].val
 
 def dropsets():
     db.query("DELETE FROM imgs")
@@ -37,29 +37,54 @@ class Admin:
 
 class Update:
     def POST(self):
-        i = web.input(update=[])
-        if i.update == "updatesetlist":
-            sets = f.photosets_GetList(api_key = Fkey, user_id = Fuser)[0]
-            dbsets = [str(x["id"]) for x in db.select("sets",what="id")]
-            for newset in [item for item in sets if item.attrib["id"] not in dbsets]:
-                db.insert(
-                    "sets",
-                    id=newset.attrib["id"],
-                    pcount=newset.attrib["photos"],
-                    pri=newset.attrib["primary"],
-                    thumb="http://farm%s.static.flickr.com/%s/%s_%s_s.jpg" % (newset.attrib["farm"],newset.attrib["server"],newset.attrib["primary"],newset.attrib["secret"]),  
-                    title=newset[0].text,
-                    desc=newset[1].text
-                )
-                print 'Added set %s' % (newset[0].text)
-            for deadset in [item for item in dbsets if item not in [y.attrib["id"] for y in sets]]:
-                db.delete("sets",where="id="+deadset)
-                print 'Deleted set %s' % (deadset)
-        if i["update"][0] == "Show Unused Sets":
-            db.update("conf",where="name='visible'",val=1)
-        elif i["update"][0] == "Hide Unused Sets":
-            db.update("conf",where="name='visible'",val=0)
-        print db.select("conf")[0]
+        global Fuser
+        i = web.input()
+        if "update" in i:
+            if re.match("Update Set List",i["update"]):
+                print Fuser
+                print Fuser
+                sets = f.photosets_GetList(api_key = Fkey, user_id = Fuser)[0]
+                dbsets = [str(x["id"]) for x in db.select("sets",what="id")]
+                for newset in [item for item in sets if item.attrib["id"] not in dbsets]:
+                    db.insert(
+                        "sets",
+                        id=newset.attrib["id"],
+                        pcount=newset.attrib["photos"],
+                        pri=newset.attrib["primary"],
+                        thumb="http://farm%s.static.flickr.com/%s/%s_%s_s.jpg" % (newset.attrib["farm"],newset.attrib["server"],newset.attrib["primary"],newset.attrib["secret"]),  
+                        title=newset[0].text,
+                        formattedtitle=re.sub("([^ ][./_]|[^\- ./]{13})([^ ])",r"\1<wbr>\2",web.websafe(newset[0].text)),
+                        desc=newset[1].text
+                    )
+                    print 'Added set %s' % (newset[0].text)
+                for deadset in [item for item in dbsets if item not in [y.attrib["id"] for y in sets]]:
+                    db.delete("sets",where="id="+deadset)
+                    print 'Deleted set %s' % (deadset)
+                print i["update"]
+            elif i["update"] == "Show Unused Sets":
+                db.update("conf",where="name='visible'",val=1)
+            elif i["update"] == "Hide Unused Sets":
+                db.update("conf",where="name='visible'",val=0)
+            elif i["update"] == "Kill All":
+                db.query("DELETE FROM imgs")
+                db.query("DELETE FROM sets")
+                db.query("DELETE FROM keys")
+        elif "show" in i:
+            db.update("sets",where="id=" + i["show"],visible=1)
+        elif "hide" in i:
+            db.update("sets",where="id=" + i["hide"],visible=0)
+        elif "user" in i:
+            if 'username' not in db.select("conf") or db.select("conf",where="name='username'")[0].val != i.user.lower():
+                dropsets()         
+                user = f.people_GetInfo(api_key = Fkey,user_id = f.people_FindByUsername(api_key = Fkey,username = i["username"])[0].attrib["nsid"])[0]
+                u = dict([(i.tag,i.text) for i in user.getchildren()])
+                db.query("delete FROM conf")
+                db.insert("conf",name="visible",val=1)
+                db.insert("conf",name="nsid",val=user.attrib["nsid"])
+                db.insert("conf",name="username",val=user.find("username").text)
+                db.insert("conf",name="photosurl",val=user.find("photosurl").text)
+                db.insert("conf",name="profileurl",val=user.find("profileurl").text)
+                Fuser = db.select("conf",where="name='nsid'")[0].val
         raise web.seeother('/')
     def GET(self):
         print "GET!!!!"
@@ -74,6 +99,7 @@ class DropSets:
 
 class UpdateUser:
     def POST(self):
+        global Fuser
         i = web.input()
         if db.select("conf",where="name=username")[0].val != i.user.lower():
             dropsets()         
@@ -84,6 +110,7 @@ class UpdateUser:
             db.insert("conf",name="username",val=user.attrib["username"].lower())
             db.insert("conf",name="photosurl",val=user.attrib["photosurl"])
             db.insert("conf",name="profileurl",val=user.attrib["profileurl"])
+            Fuser = db.select("conf",where="name='nsid'")[0].val
 
 class UpdateImgs:
     def __init__(self,setids):
