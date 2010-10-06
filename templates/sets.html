@@ -1,20 +1,26 @@
-$def with (conf,sets,imgs)
+$def with (conf,sets)
 <!doctype html><html><head><title>Sets</title><link rel="stylesheet" href="/a.css"/><script type="text/javascript" src="/a.js"></script></head>
 <body><ul>
 <form name="testform" action="/update" method="post">
-<input class="button" type="submit" name="update" value="Update Set List [$len(sets)]"/><input class="button" type="submit" name="update" value="Update All Images [$imgs]"/>
+<input class="button" type="submit" name="update" value="Update Set List [$len(sets)]"/><input class="button" type="submit" name="update" value="Update All Images [$conf["imgs"]]"/>
 $for s in [s for s in sets if s.visible]:
-    <li><a href=/view/$s.id><img src="$s.thumb"/></a><a href=/view/$s.id>$:s.formattedtitle</a><i>$s.pcount</i>\
+    <li\
+    $if s.changed:
+         class="changed"\
+    ><a href=$conf["photosurl"]sets/$s.id><img src="$s.thumb"/></a><a href=/view/$s.id>$:s.formattedtitle</a><i>$s.pcount</i>\
     <input class="update" href=/update/$s.id />\
     <input class="hide" type="submit" name="hide" value="$s.id"/></li>\
 $if 'visible' in conf and conf['visible'] == "1":
     <input class="button" type="submit" name="update" value="Hide Unused Sets" />
     $for s in [s for s in sets if not s.visible]:
-        <li class="unused"><a href=http://www.flickr.com/photos/nylecoj/sets/$s.id/><img src="$s.thumb"/></a><span>$:s.formattedtitle</span><i>$s.pcount</i>\
+        <li\
+        $if s.changed:
+             class="changed"\
+         class="unused"><a href=$conf["photosurl"]sets/$s.id/><img src="$s.thumb"/></a><span>$:s.formattedtitle</span><i>$s.pcount</i>\
         <input class="show" type="submit" name="show" value="$s.id" /></li>\
 $else:
     <input class="button" type="submit" name="update" value="Show Unused Sets" />
-<input class="button" type="text" name="username" value="$conf["username"]" />
+<input style="background-image:url($conf["buddyicon"])" class="button entry" type="text" name="username" value="$conf["username"]" />
 <input class="button" type="submit" name="user" value="Change User" />
 <input class="button" type="submit" name="update" value="Kill All" />
 </form> 

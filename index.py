@@ -14,6 +14,7 @@ f = flickrapi.FlickrAPI(Fkey, Fsecret)
 db = web.database(dbn='sqlite',db='gal.db')
 render = web.template.render('templates/')
 progress = 0
+ChangedSet = 0
 Fuser = db.select("conf",where="name='nsid'")[0].val
 
 def dropsets():
@@ -33,11 +34,20 @@ class ViewUsedSets:
 
 class Admin:
     def GET(self):
-        return render.sets(dict([(conf.name,conf.val) for conf in db.select("conf")]),list(db.select("sets")),len(list(db.select('imgs'))))
+        global ChangedSet
+        sets = list(db.select("sets"))
+        for s in sets:
+            if s.id == ChangedSet:
+                s.changed = True
+            else:
+                s.changed = False
+        ChangedSet = 0
+        return render.sets(dict([(conf.name,conf.val) for conf in db.select("conf")],imgs=len(list(db.select('imgs')))),sets)
 
 class Update:
     def POST(self):
         global Fuser
+        global ChangedSet
         i = web.input()
         if "update" in i:
             if re.match("Update Set List",i["update"]):
@@ -71,8 +81,10 @@ class Update:
                 db.query("DELETE FROM keys")
         elif "show" in i:
             db.update("sets",where="id=" + i["show"],visible=1)
+            ChangedSet = int(i["show"])
         elif "hide" in i:
             db.update("sets",where="id=" + i["hide"],visible=0)
+            ChangedSet = int(i["hide"])
         elif "user" in i:
             if 'username' not in db.select("conf") or db.select("conf",where="name='username'")[0].val != i.user.lower():
                 dropsets()         
@@ -82,6 +94,7 @@ class Update:
                 db.insert("conf",name="visible",val=1)
                 db.insert("conf",name="nsid",val=user.attrib["nsid"])
                 db.insert("conf",name="username",val=user.find("username").text)
+                db.insert("conf",name="buddyicon",val="http://farm%s.static.flickr.com/%s/buddyicons/%s.jpg" % (user.attrib["iconfarm"],user.attrib["iconserver"],user.attrib["nsid"]))  
                 db.insert("conf",name="photosurl",val=user.find("photosurl").text)
                 db.insert("conf",name="profileurl",val=user.find("profileurl").text)
                 Fuser = db.select("conf",where="name='nsid'")[0].val
