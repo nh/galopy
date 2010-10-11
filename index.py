@@ -27,8 +27,6 @@ class UpdateStatus:
 class ViewUsedSets:
     def GET(self):
         return render.sets(db.select("user")[0],list(db.select("sets",where="visible=1")),len(list(db.select('imgs'))),False)
-    #def POST(self):
-        #?????????????????????????????????????? GET/POST SEPARATION NEEDS FIXIN!
 
 class Admin:
     def GET(self):
@@ -74,17 +72,7 @@ class Update:
                     print 'Deleted set %s' % (deadset)
                 print i["update"]
             elif re.match("Update All Images",i["update"]):
-                # ALL IMG UPDATE #
-                db_imgs = dict([(str(x.id),x.lastupdate) for x in db.select("imgs")])
-                for set in db.select("sets",what="id",where="visible=1"):
-                    for setimg in list(f.photosets_GetPhotos(api_key = Fkey, photoset_id = set.id,extras="last_update,url_sq,url_m")[0]):
-                        if setimg.attrib["id"] not in db_imgs:
-                            db.query("INSERT OR IGNORE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=setimg.attrib)
-                            db.insert("keys",img_id=setimg.attrib["id"],set_id=set.id) # ...but still add to this set's images in the keys table
-                        elif int(setimg.attrib["lastupdate"]) > db_imgs[setimg.attrib["id"]]:
-                            db.query("INSERT OR IGNORE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=setimg.attrib)
-                db.query("UPDATE sets SET dbcount = (SELECT COUNT(*) FROM keys WHERE set_id=sets.id)")
-                print db_imgs
+                UpdateImgs([str(x.id) for x in db.select("sets",where="visible=1")])
             elif i["update"] == "Show Unused Sets":
                 db.update("conf",where="name='visible'",val=1)
             elif i["update"] == "Hide Unused Sets":
@@ -145,56 +133,20 @@ class UpdateUser:
 class UpdateImgs:
     def __init__(self,setids):
         global progress
-        up = time.time() 
-        progress = 0
-        imgs = {}
-        DBimgs = {}
-        #setsquery = "".join(["keys.set_id = %s OR " % k for k in setids]).rstrip(" OR ")
-        #dbimgsids = [str(x.id) for x in db.query("SELECT imgs.id FROM imgs INNER JOIN keys ON imgs.id = keys.img_id AND (" + setsquery + ")")] #MUCH SIMPLER DB QUERY IF PER-SET???
-
-        for setid in setids: #hit up flickr for images in all chosen sets
+        for setid in setids:
             setimgs = dict([(x.attrib["id"],x) for x in f.photosets_GetPhotos(api_key = Fkey, photoset_id = setid,extras="last_update,url_sq,url_m")[0]])
             DBsetimgs = dict([(str(x.img_id),x.lastupdate) for x in db.query("SELECT * FROM imgs INNER JOIN keys ON imgs.id = keys.img_id AND keys.set_id = "+setid)])
-            for imgid, setimg in iteritems(setimgs):
+            for imgid, setimg in setimgs.iteritems():
                 if imgid not in DBsetimgs:
                     db.query("INSERT OR IGNORE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=setimg.attrib)
-                    db.insert("keys",img_id=setimg.attrib["id"],set_id=setid) # ...but still add to this set's images in the keys table
+                    db.insert("keys",img_id=setimg.attrib["id"],set_id=setid)
                 elif int(setimg.attrib["lastupdate"]) > DBsetimgs[setimg.attrib["id"]]:
                     db.query("REPLACE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=setimg.attrib)
-            for dead in [i for i in DBsetimgs if i not in setimgs]:
+            for dead in [i for i in DBsetimgs.keys() if i not in setimgs]:
                 db.delete("keys",where="img_id="+dead)
-            DBimgs = DBimgs.update(DBsetimgs)
-            imgs = imgs.update(setimgs)
-            # Don't add image to full imglist if it already exists in another set...
-            #for deadkey in [DBi for DBi in DBsetimgs if DBi not in [str(i.attrib["id"]) for i in setimgs]]:       REDUNDANT!?
-            #    db.delete("keys",where="img_id="+deadkey) #????????????/                                          REDUNDANT!?
-                    
-            #imgs.extend([y.attrib["id"] for y in setimgs])
-            #DBimgs.extend(DBsetimgs)                                                    ### HOW/WHEN TO KILL IMAGES WHEN SET IS CHANGED TO HIDDEN  ###
-            #progress += 1
-
-        #for newimg in [item for item in imgs if item.attrib["id"] not in dbimgsids]: # All new images that are not already in this set
-            #db.query("INSERT OR IGNORE INTO imgs (id,title,lastupdate,url_sq,url_m) VALUES ($id,$title,$lastupdate,$url_sq,$url_m)", vars=newimg.attrib) # Don't add image to full imglist if it already exists in another set...
-            #db.insert("keys",img_id=newimg.attrib["id"],set_id=setid) # ...but still add to this set's images in the keys table
-
-        #for changedimg in [x for x in imgs if int(x.attrib["lastupdate"]) > db.select("imgs",what="lastupdate",where="id="+x.attrib["id"])[0].lastupdate]:
-        #    db.update("imgs",where="id="+changedimg.attrib["id"],title=changedimg.attrib["title"],lastupdate=changedimg.attrib["lastupdate"])
-        #    print "update %s" % changedimg.attrib["title"]
-
-        for deadimg in [img for img in DBimgs if img not in imgs]:
-            db.delete("imgs",where="id="+deadimg)
-            print 'Deleted image %s' % (deadimg)
-
-        #for setid in setids:
-        #    set = db.select("sets",where="id="+str(setid))[0]
-        #    if set.pcount == set.dbcount:
-        #        print "unchanged"
-        #    else:
-        #        print "changed"
-
+        db.query("DELETE FROM imgs WHERE (SELECT COUNT(*) FROM keys WHERE img_id=imgs.id)=0")
         db.query("UPDATE sets SET dbcount = (SELECT COUNT(*) FROM keys WHERE set_id=sets.id)")
         progress = 0
-        print time.time() - up
 
 class UpdateAll:
     def GET(self):
