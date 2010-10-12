@@ -1,6 +1,0 @@
-$def with (set,imgs)
-<!doctype html><html><head><title>$set.title</title></head><link rel="stylesheet" href="/a.css"/>
-<body ><h1><a href="/sets/update/$set.id">$set.title <b>[$len(imgs)]</b></a></h1>
-<div id="showset">
-$for i in imgs:
-    <a href="$i.url_m"><img src=$i.url_sq /></a>
