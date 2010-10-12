@@ -1,11 +1,11 @@
-$def with (sets,G)
+$def with (sets)
 <!DOCTYPE html>
 <html>
 <head>
-    <title>$G.name</title>
-    <link rel="stylesheet" href="${G.media}/style.css" />
+    <title>xx</title>
+    <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-<a href="$G.root">$G.name</a></div>
+<a href="/">Home</a></div>
     $for set in sets:
-        <a href="${G.root}set/$set.id/">$set.title [$set.pcount]</a>
+        <a href="/$set.slug/">$set.title [$set.pcount]</a>

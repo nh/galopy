@@ -25,7 +25,7 @@ def dropsets():
 
 def updateimgs(sets):
     global progress
-    open(Static+"index.html","w").write("aaaaaaaaaaaa")
+    open(Static+"index.html","w").write(str(render.index(db.select("sets",where="visible=1"))))
     for set in sets:
         if set.visible == 2:
             db.update("sets",where="id="+str(set.id),visible=0)
