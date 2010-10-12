@@ -1,5 +1,4 @@
 import flickrapi, web, time, re, os
-import elementtree.ElementTree as ET
 
 db = "gal.db"
 Fkey = "04133797314d6ff600f07314fe061643"
@@ -154,7 +153,7 @@ urls = (
     "/","Admin",
 )
 
-app = web.application(urls, globals())
-#application = web.application(urls, globals()).wsgifunc()
+#app = web.application(urls, globals())
+application = web.application(urls, globals()).wsgifunc()
 if __name__ == "__main__":
     app.run()
