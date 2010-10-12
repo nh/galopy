@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="18"
+   name=""
+   committed-date="2006-06-28T14:02:22.708291Z"
+   url="http://svn.antrix.net/webr/tags/0.3/templates"
+   last-author="antrix"
+   kind="dir"
+   uuid="88f8704d-3112-0410-a054-e8b9f8f64d51"
+   repos="http://svn.antrix.net/webr"
+   revision="23"/>
+<entry
+   committed-rev="14"
+   name="yellow.css"
+   text-time="2006-07-10T15:19:28.000000Z"
+   committed-date="2006-06-11T08:23:28.965793Z"
+   checksum="f32c8b12bdafb4ed74ea3f7a088e0aa7"
+   last-author="antrix"
+   kind="file"
+   prop-time="2006-07-10T15:19:28.000000Z"/>
+<entry
+   committed-rev="14"
+   name="green.css"
+   text-time="2006-07-10T15:19:28.000000Z"
+   committed-date="2006-06-11T08:23:28.965793Z"
+   checksum="8e55c296a72be276c4d43c37a2199286"
+   last-author="antrix"
+   kind="file"
+   prop-time="2006-07-10T15:19:28.000000Z"/>
+<entry
+   committed-rev="14"
+   name="style.css"
+   text-time="2006-07-10T15:19:28.000000Z"
+   committed-date="2006-06-11T08:23:28.965793Z"
+   checksum="f6061a0657315f1a32abee776affd57b"
+   last-author="antrix"
+   kind="file"
+   prop-time="2006-07-10T15:19:28.000000Z"/>
+<entry
+   committed-rev="18"
+   name="index.html"
+   text-time="2006-07-10T15:19:28.000000Z"
+   committed-date="2006-06-28T14:02:22.708291Z"
+   checksum="22d3a6c4a7856ea301c4493ce83522a2"
+   last-author="antrix"
+   kind="file"
+   prop-time="2006-07-10T15:19:28.000000Z"/>
+<entry
+   committed-rev="18"
+   name="photo.html"
+   text-time="2006-07-10T15:19:28.000000Z"
+   committed-date="2006-06-28T14:02:22.708291Z"
+   checksum="d6954069f07d81f619426400f5c315df"
+   last-author="antrix"
+   kind="file"
+   prop-time="2006-07-10T15:19:28.000000Z"/>
+<entry
+   committed-rev="18"
+   name="set.html"
+   text-time="2006-07-10T15:19:28.000000Z"
+   committed-date="2006-06-28T14:02:22.708291Z"
+   checksum="f131d3ed2c8aa06d8858fa863969e3da"
+   last-author="antrix"
+   kind="file"
+   prop-time="2006-07-10T15:19:28.000000Z"/>
+</wc-entries>
